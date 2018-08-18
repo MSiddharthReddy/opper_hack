@@ -22,10 +22,8 @@ const resolvers = {
   Query: {
     users: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
         db.collection(USERS).find({}).toArray((err, docs) => {
-          if (err) {
-            console.error(err);
-            return res(null);
-          }
+          if (err) console.error(err);
+          else console.log(docs);
           return res(docs);
         });
       })),
@@ -45,14 +43,8 @@ const resolvers = {
         acc.concat({ name, link: args.links[index]}),
       []);
 
-      return doMongo(async(db, err) => new Promise((res, rej) => {
-        if (err !== null) {
-          console.error(err);
-          return res(null);
-        }
-        const collection = db.collection(RESOURCES);
-
-        collection.insertMany(result, (err, result) => {
+      return doMongo(async(db) => new Promise((res, rej) => {
+        db.collection(RESOURCES).insertMany(result, (err, result) => {
           if (err !== null) {
             console.error(err);
             return res(null);
@@ -86,10 +78,28 @@ const resolvers = {
       db.collection(SCHOOL_EVENTS).find({ schoolName: school.name }).toArray((err, docs) => {
         if (err) console.error(err);
         else console.log(docs);
-        return res({});
+        return res(docs);
       });
     })),
+
+    students: async(school) => doMongo(async(db, err) => new Promise((res, rej) => {
+      db.collection(SCHOOL_EVENTS).find({ schoolName: school.name }).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res(docs);
+      });
+    }))
   },
+
+  User: {
+    school: async(user) => doMongo(async(db, err) => new Promise((res, rej) => {
+      db.collection(SCHOOLS).find({ name: user.currentSchoolName }).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res(docs);
+      });
+    }))
+  }
 };
 
 const app = express();
