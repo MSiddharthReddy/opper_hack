@@ -1,16 +1,17 @@
 type Query {
-  user(id: String): [User!]
+  users(id: String): [User!]
 }
 
 type Mutation {
   addUser(firstName: String, lastName: String, email: String, inCollege: Boolean, address: String, major: String): Query
-  addResources(names: [String!], url: [String!]): Query
+  addResources(names: [String!]!, url: [String!]!): Query
 }
 
 type User {
   id: String
 
   name: Name
+  age: Int
   email: String
   inCollege: Boolean
   address: String
@@ -30,7 +31,7 @@ type College {
 }
 
 type Resource {
-  name: Name
+  name: String
   link: String
 }
 
