@@ -68,15 +68,16 @@ enum SchoolType {
 type School {
   name: String
   type: SchoolType
-  events: [Event]
+  events: [Event!]!
   registrationDeadline: String
 
-  students: [User]
+  students: [User!]!
 }
 
 type Resource {
-  name: String
-  link: String
+  name: String!
+  link: String!
+  tag: String
 }
 
 type Event {
