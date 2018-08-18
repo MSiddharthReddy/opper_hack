@@ -1,0 +1,29 @@
+type Query {
+  user(id: String): [User]
+}
+
+type Mutation {
+  todo: String 
+}
+
+type User {
+  id: String
+
+  name: Name
+  events: [Event]
+}
+
+type Name {
+  formal: String
+  informal: String
+}
+
+type College {
+  name: Name
+}
+
+type Event {
+  link: String
+  name: Name
+  description: String
+}
