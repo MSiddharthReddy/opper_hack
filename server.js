@@ -5,12 +5,11 @@ schema = fs.readFileSync('./schema/schema.graphql').toString();
 
 const doMongo = require('./mongo.js');
 
-// Type definitions define the "shape" of your data and specify
-// which ways the data can be fetched from the GraphQL server.
 const typeDefs = gql(schema);
 
-// Resolvers define the technique for fetching the types in the
-// schema.  We'll retrieve books from the "books" array above.
+
+const RESOURCES = 'resources';
+
 const resolvers = {
   Query: {
     users: async(obj, args, context) => {
@@ -22,7 +21,21 @@ const resolvers = {
   },
   Mutation: {
     addResources: async(obj, args, context) => {
-      const result = args.names.reduce
+      const result = args.names.reduce((acc, name, index) =>
+        acc.concat({ name, link: args.urls[index]}), []);
+
+      doMongo((db, err) => {
+        if (err !== null) return console.error(err);
+        const collection = db.collection(RESOURCES);
+
+        collection.insertMany(result, (err, result) => {
+          if (err !== null) return console.error(err);
+
+          console.log(RESOURCES, result);
+        });
+      });
+
+      return {};
     }
   },
 };
