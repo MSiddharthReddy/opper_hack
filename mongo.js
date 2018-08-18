@@ -1,11 +1,15 @@
 const MongoClient = require('mongodb').MongoClient;
 const config = require('./config.json');
 
+
 // Connection URL
 const url = config.mongoURL;
 
+console.log(url)
+
+
 // Database Name
-const dbName = 'myproject';
+const dbName = 'opeertunity_hack';
 
 // Use connect method to connect to the server
 

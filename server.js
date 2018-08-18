@@ -21,41 +21,19 @@ const resolvers = {
     },
   },
   User: {
-
   },
   Mutation: {
     addResources: async(obj, args, context) => {
       const result = args.names.reduce
     },
-    addUser: async(obj, args, context) => {
-      const {
-        name,
-        age,
-        email,
-        inCollege,
-        address,
-        major
-      } = args;
+    addUser:async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+     db.collection(USERS).insert(args, (err, result) => {
+       if (err) console.error(err);
+       else console.log(result);
+       return res({});
+     });
+   }))
 
-      doMongo((db, err) => {
-        if(err) {
-          console.log(err);
-          return;
-        }
-
-        USERS.insert({
-          name,
-          age,
-          email,
-          inCollege,
-          address,
-          major
-        });
-
-      });
-
-      return {};
-    }
   },
 };
 

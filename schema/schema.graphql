@@ -3,14 +3,15 @@ type Query {
 }
 
 type Mutation {
-  addUser(firstName: String, lastName: String, email: String, inCollege: Boolean, address: String, major: String): Query
+  addUser(firstName: String!, lastName: String!, email: String!, inCollege: Boolean, address: String, major: String): Query
   addResources(names: [String!]!, url: [String!]!): Query
 }
 
 type User {
   id: String
 
-  name: Name
+  firstName: String
+  lastName: String
   age: Int
   email: String
   inCollege: Boolean
@@ -24,7 +25,7 @@ type Name {
 }
 
 type College {
-  name: Name
+  name: String
 
   events: [Event]
   registrationDeadline: String
@@ -37,7 +38,7 @@ type Resource {
 
 type Event {
   link: String
-  name: Name
+  name: String
   description: String
   deadline: String
 }
