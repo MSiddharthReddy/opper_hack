@@ -103,6 +103,13 @@ const resolvers = {
 };
 
 const app = express();
+
+app.post('/registration-form', (req, res) => {
+  console.log(req.body);
+
+  res.status(200).end();
+});
+
 const server = new ApolloServer({ typeDefs, resolvers });
 server.applyMiddleware({app});
 
