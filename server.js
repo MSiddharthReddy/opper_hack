@@ -12,7 +12,7 @@ const url = 'mongodb://hacker:iloveicecream1@ds125912.mlab.com:25912/opeertunity
 const dbName = 'myproject';
 
 // Use connect method to connect to the server
-MongoClient.connect(url,{ useNewUrlParser: true }, function(err, client) {
+MongoClient.connect(url, { useNewUrlParser: true }, (err, client) => {
 
   const db = client.db(dbName);
 
@@ -29,6 +29,10 @@ const typeDefs = gql(schema);
 // schema.  We'll retrieve books from the "books" array above.
 const resolvers = {
   Query: {
+    
+  },
+  User: {
+
   },
   Mutation: {
   },
