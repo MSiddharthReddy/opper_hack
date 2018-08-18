@@ -4,7 +4,7 @@ const MongoClient = require('mongodb').MongoClient;
 const url = 'mongodb://hacker:iloveicecream1@ds125912.mlab.com:25912/opeertunity_hack';
 
 // Database Name
-const dbName = 'myproject';
+const dbName = 'opeertunity_hack';
 
 // Use connect method to connect to the server
 
@@ -15,6 +15,6 @@ module.exports = async(callback) => new Promise((resolve, reject) => {
     const db = client.db(dbName);
     const result = await callback(db, err);
     client.close();
-    return res(result);
+    return resolve(result);
   });
 });

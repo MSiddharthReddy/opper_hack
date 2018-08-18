@@ -18,7 +18,10 @@ const resolvers = {
         collection = db.collection(USERS);
 
         collection.find({}).toArray((err, docs) => {
-          if (err) return rej(err);
+          if (err) {
+            console.error(err);
+            return res(null);
+          }
           return res(docs);
         });
       })),
