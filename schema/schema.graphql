@@ -29,6 +29,8 @@ type Mutation {
 
   "Mutation to add single school"
   addSchool(name: String!, type: SchoolType!, registrationDeadline: String!): Query
+
+  "Adds event for school with school name"
   addSchoolEvent(schoolName: String!, link: String!, name: String!, description: String!, deadline: String!): Query
 }
 
@@ -49,6 +51,9 @@ type User {
 
   "The desired major of this person"
   desiredMajor: String
+
+  "List of items this person should do in order to best be ready"
+  checklist: [UserEvents!]!
 
   "This is the school of the user"
   school: School
@@ -71,12 +76,32 @@ type School {
   registrationDeadline: String
 
   students: [User!]!
+
+  resources: [Resource]
 }
 
 type Resource {
   name: String!
   link: String!
   tag: String
+
+  school: School
+}
+
+enum UserEventState {
+  TODO
+  IN_PROGRESS
+  COMPLETE
+}
+
+type UserEvent {
+  event: Event
+  eventName: String
+
+  user: User
+  username: String
+
+  state: UserEventState
 }
 
 type Event {

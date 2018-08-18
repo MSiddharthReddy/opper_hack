@@ -61,7 +61,7 @@ const resolvers = {
     },
 
     addSchool: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOLS).insert(args, (err, result) => {
+      db.collection(SCHOOLS).updateOne({ name: args.name }, { $set: args }, { upsert: true}, (err, result) => {
         if (err) console.error(err);
         else console.log(result);
         return res({});
@@ -69,7 +69,8 @@ const resolvers = {
     })),
 
     addSchoolEvent: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOL_EVENTS).insert(args, (err, result) => {
+      db.collection(SCHOOL_EVENTS).updateOne({ name: args.name, schoolName: args.schoolName },
+        { $set: args }, { upsert: true }, (err, result) => {
         if (err) console.error(error);
         else console.log(result);
         return res({});
@@ -98,6 +99,16 @@ const resolvers = {
   User: {
     school: async(user) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOLS).find({ name: user.schoolName }).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res(docs);
+      });
+    }))
+  },
+
+  Resource: {
+    school: async(resource) => doMongo(async(db) => new Promise((res, rej) => {
+      db.collection(SCHOOLS).find({ name: resource.schoolName }).toArray((err, docs) => {
         if (err) console.error(err);
         else console.log(docs);
         return res(docs);
