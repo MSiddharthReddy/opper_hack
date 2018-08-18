@@ -32,7 +32,15 @@ const resolvers = {
       db.collection(SCHOOLS).find(filterUndefined({ name: args.name, type: args.schoolType })).toArray((err, docs) => {
         if (err) console.error(err);
         else console.log(docs);
-        return res({});
+        return res(docs);
+      });
+    })),
+
+    resources: async() => doMongo(async(db) => new Promise((res, rej) => {
+      db.collection(RESOURCES).find({}).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res(docs);
       });
     })),
   },
@@ -45,13 +53,9 @@ const resolvers = {
 
       return doMongo(async(db) => new Promise((res, rej) => {
         db.collection(RESOURCES).insertMany(result, (err, result) => {
-          if (err !== null) {
-            console.error(err);
-            return res(null);
-          }
-
-          console.log(RESOURCES, result);
-          return res({});
+          if (err !== null) console.error(err);
+          else console.log(result);
+          return res(result);
         });
       }));
     },
