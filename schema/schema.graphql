@@ -1,22 +1,22 @@
 type Query {
   users(id: String): [User!]
   resources(name: String): [Resource]
-  colleges(name: String): [School]
-  highSchools(name: String): [School]
+  schools(name: String, type: SchoolType): [School]
 }
 
 type Mutation {
   addUser(firstName: String, lastName: String, email: String, inCollege: Boolean, address: String, major: String): Query
   addResources(names: [String!]!, links: [String!]!): Query
   addUserSchool(userID: String, schoolName: String): Query
-  addSchool(name: String, type: SchoolType, registrationDeadline: String): Query
-  addSchoolEvent(schoolName: String, link: String, name: String, description: String, deadline: String): Query
+  addSchool(name: String!, type: SchoolType!, registrationDeadline: String!): Query
+  addSchoolEvent(schoolName: String!, link: String!, name: String!, description: String!, deadline: String!): Query
 }
 
 type User {
   id: String
 
-  name: Name
+  firstName: String
+  lastName: String
   age: Int
   email: String
 
@@ -36,11 +36,6 @@ type User {
   college: School
 }
 
-type Name {
-  formal: String
-  informal: String
-}
-
 enum SchoolType {
   COLLEGE
   HIGH_SCHOOL
@@ -49,7 +44,7 @@ enum SchoolType {
 }
 
 type School {
-  name: Name
+  name: String
   type: SchoolType
 
   events: [Event]
@@ -63,7 +58,8 @@ type Resource {
 
 type Event {
   link: String
-  name: Name
+  name: String
   description: String
   deadline: String
+  schoolName: String
 }
