@@ -9,11 +9,12 @@ const dbName = 'myproject';
 // Use connect method to connect to the server
 
 
-module.exports = (callback) => {
-  MongoClient.connect(url, { useNewUrlParser: true }, (err, client) => {
-    if (err) return callback(null, err);
+module.exports = async(callback) => new Promise((resolve, reject) => {
+  MongoClient.connect(url, { useNewUrlParser: true }, async(err, client) => {
+    if (err) return reject(err);
     const db = client.db(dbName);
-    callback(db, err);
+    const result = await callback(db, err);
     client.close();
+    return res(result);
   });
-}
+});

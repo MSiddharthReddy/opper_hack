@@ -9,12 +9,19 @@ const typeDefs = gql(schema);
 
 
 const RESOURCES = 'resources';
+const USERS = 'users';
 
 const resolvers = {
   Query: {
-    users: async(obj, args, context) => {
-      // doMongo()
-    },
+    users: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+
+        collection = db.collection(USERS);
+
+        collection.find({}).toArray((err, docs) => {
+          if (err) return rej(err);
+          return res(docs);
+        });
+      })),
   },
   User: {
 
