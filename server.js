@@ -20,21 +20,27 @@ const filterUndefined = (obj) => Object.keys(obj).reduce((acc, n) => {
 
 const resolvers = {
   Query: {
-    users: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+    users: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
         db.collection(USERS).find({}).toArray((err, docs) => {
-          if (err) {
-            console.error(err);
-            return res(null);
-          }
+          if (err) console.error(err);
+          else console.log(docs);
           return res(docs);
         });
       })),
 
-    schools: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+    schools: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOLS).find(filterUndefined({ name: args.name, type: args.schoolType })).toArray((err, docs) => {
         if (err) console.error(err);
         else console.log(docs);
-        return res({});
+        return res(docs);
+      });
+    })),
+
+    resources: async() => doMongo(async(db) => new Promise((res, rej) => {
+      db.collection(RESOURCES).find({}).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res(docs);
       });
     })),
   },
@@ -45,21 +51,11 @@ const resolvers = {
         acc.concat({ name, link: args.links[index]}),
       []);
 
-      return doMongo(async(db, err) => new Promise((res, rej) => {
-        if (err !== null) {
-          console.error(err);
-          return res(null);
-        }
-        const collection = db.collection(RESOURCES);
-
-        collection.insertMany(result, (err, result) => {
-          if (err !== null) {
-            console.error(err);
-            return res(null);
-          }
-
-          console.log(RESOURCES, result);
-          return res({});
+      return doMongo(async(db) => new Promise((res, rej) => {
+        db.collection(RESOURCES).insertMany(result, (err, result) => {
+          if (err !== null) console.error(err);
+          else console.log(result);
+          return res(result);
         });
       }));
     },
@@ -78,7 +74,7 @@ const resolvers = {
       });
     })),
 
-    addSchoolEvent: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+    addSchoolEvent: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOL_EVENTS).insert(args, (err, result) => {
         if (err) console.error(error);
         else console.log(result);
@@ -96,17 +92,42 @@ const resolvers = {
   },
 
   School: {
-    events: async(school) => doMongo(async(db, err) => new Promise((res, rej) => {
+    events: async(school) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOL_EVENTS).find({ schoolName: school.name }).toArray((err, docs) => {
         if (err) console.error(err);
         else console.log(docs);
-        return res({});
+        return res(docs);
       });
     })),
+
+    students: async(school) => doMongo(async(db) => new Promise((res, rej) => {
+      db.collection(USERS).find({ schoolName: school.name }).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res(docs);
+      });
+    }))
   },
+
+  User: {
+    school: async(user) => doMongo(async(db) => new Promise((res, rej) => {
+      db.collection(SCHOOLS).find({ name: user.schoolName }).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res(docs);
+      });
+    }))
+  }
 };
 
 const app = express();
+
+app.post('/registration-form', (req, res) => {
+  console.log(req.body);
+
+  res.status(200).end();
+});
+
 const server = new ApolloServer({ typeDefs, resolvers });
 server.applyMiddleware({app});
 

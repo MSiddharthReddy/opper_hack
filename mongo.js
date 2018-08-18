@@ -13,7 +13,7 @@ module.exports = async(callback) => new Promise((resolve, reject) => {
   MongoClient.connect(url, { useNewUrlParser: true }, async(err, client) => {
     if (err) return reject(err);
     const db = client.db(dbName);
-    const result = await callback(db, err);
+    const result = await callback(db);
     client.close();
     return resolve(result);
   });

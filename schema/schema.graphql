@@ -5,17 +5,35 @@ type Query {
 }
 
 type Mutation {
-  addUser(firstName: String, lastName: String, email: String, inCollege: Boolean, address: String, major: String): Query
+
+  "Mutation to add single user"
+  addUser(
+    firstName: String,
+    lastName: String,
+    age: Int,
+
+    email: String,
+    address: String,
+
+    schoolState: SchoolType,
+
+    "This can be either the desired major if the person is not in college or it can be desired major"
+    major: String,
+
+    "This is the current school name of the user"
+    schoolName: String
+  ): Query
+
+  "Add resource to db"
   addResources(names: [String!]!, links: [String!]!): Query
-  addUserSchool(userID: String, schoolName: String): Query
+
+  "Mutation to add single school"
   addSchool(name: String!, type: SchoolType!, registrationDeadline: String!): Query
   addResourceTag(name: String!): Query
   addSchoolEvent(schoolName: String!, link: String!, name: String!, description: String!, deadline: String!): Query
 }
 
 type User {
-  id: String
-
   firstName: String
   lastName: String
   age: Int
@@ -32,9 +50,11 @@ type User {
 
   "The desired major of this person"
   desiredMajor: String
-  highSchool: School
-  middleSchool: School
-  college: School
+
+  "This is the school of the user"
+  school: School
+
+  schoolName: String
 }
 
 enum SchoolType {
@@ -50,6 +70,8 @@ type School {
   type: SchoolType
   events: [Event]
   registrationDeadline: String
+
+  students: [User]
 }
 
 type Resource {
@@ -62,5 +84,6 @@ type Event {
   name: String
   description: String
   deadline: String
+  school: School
   schoolName: String
 }

@@ -14,9 +14,6 @@ let urls = [];
 scraper.search(options, function(err, url, meta) {
   // This is called for each result
   if(err) throw err;
-  console.log(url);
-  console.log(meta.title);
-  console.log(meta.desc)
   doMongo(async(db, err) => new Promise((res, rej) => {
     db.collection(RESOURCES).updateOne({
       link: url
