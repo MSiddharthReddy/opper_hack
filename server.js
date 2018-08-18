@@ -5,26 +5,63 @@ schema = fs.readFileSync('./schema/schema.graphql').toString();
 
 const doMongo = require('./mongo.js');
 
-// Type definitions define the "shape" of your data and specify
-// which ways the data can be fetched from the GraphQL server.
 const typeDefs = gql(schema);
 
+const RESOURCES = 'resources';
+const USERS = 'users';
+const SCHOOLS = 'schools';
+const SCHOOL_EVENTS = 'schoolEvents';
+const RESOURCE_TAGS = 'resourceTags';
 
-const USERS ='users';
+const filterUndefined = (obj) => Object.keys(obj).reduce((acc, n) => {
+  if (obj[n] !== undefined) acc[n] = obj[n];
+  return acc;
+}, {});
 
-// Resolvers define the technique for fetching the types in the
-// schema.  We'll retrieve books from the "books" array above.
 const resolvers = {
   Query: {
-    users: async(obj, args, context) => {
-      // doMongo()
-    },
+    users: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+        db.collection(USERS).find({}).toArray((err, docs) => {
+          if (err) {
+            console.error(err);
+            return res(null);
+          }
+          return res(docs);
+        });
+      })),
+
+    schools: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+      db.collection(SCHOOLS).find(filterUndefined({ name: args.name, type: args.schoolType })).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res({});
+      });
+    })),
   },
-  User: {
-  },
+
   Mutation: {
     addResources: async(obj, args, context) => {
-      const result = args.names.reduce
+      const result = args.names.reduce((acc, name, index) =>
+        acc.concat({ name, link: args.links[index]}),
+      []);
+
+      return doMongo(async(db, err) => new Promise((res, rej) => {
+        if (err !== null) {
+          console.error(err);
+          return res(null);
+        }
+        const collection = db.collection(RESOURCES);
+
+        collection.insertMany(result, (err, result) => {
+          if (err !== null) {
+            console.error(err);
+            return res(null);
+          }
+
+          console.log(RESOURCES, result);
+          return res({});
+        });
+      }));
     },
     addUser:async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
      db.collection(USERS).insert(args, (err, result) => {
@@ -32,8 +69,40 @@ const resolvers = {
        else console.log(result);
        return res({});
      });
-   }))
+   })),
+    addSchool: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+      db.collection(SCHOOLS).insert(args, (err, result) => {
+        if (err) console.error(err);
+        else console.log(result);
+        return res({});
+      });
+    })),
 
+    addSchoolEvent: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+      db.collection(SCHOOL_EVENTS).insert(args, (err, result) => {
+        if (err) console.error(error);
+        else console.log(result);
+        return res({});
+      });
+    })),
+
+    addResourceTag: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+      db.collection(RESOURCE_TAGS).insert(args, (err, result) => {
+        if (err) console.error(err);
+        else console.log(result);
+        return res({});
+      });
+    })),
+  },
+
+  School: {
+    events: async(school) => doMongo(async(db, err) => new Promise((res, rej) => {
+      db.collection(SCHOOL_EVENTS).find({ schoolName: school.name }).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res({});
+      });
+    })),
   },
 };
 
