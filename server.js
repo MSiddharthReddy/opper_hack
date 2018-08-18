@@ -20,7 +20,7 @@ const filterUndefined = (obj) => Object.keys(obj).reduce((acc, n) => {
 
 const resolvers = {
   Query: {
-    users: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+    users: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
         db.collection(USERS).find({}).toArray((err, docs) => {
           if (err) console.error(err);
           else console.log(docs);
@@ -28,7 +28,7 @@ const resolvers = {
         });
       })),
 
-    schools: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+    schools: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOLS).find(filterUndefined({ name: args.name, type: args.schoolType })).toArray((err, docs) => {
         if (err) console.error(err);
         else console.log(docs);
@@ -56,7 +56,7 @@ const resolvers = {
       }));
     },
 
-    addSchool: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+    addSchool: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOLS).insert(args, (err, result) => {
         if (err) console.error(err);
         else console.log(result);
@@ -64,7 +64,7 @@ const resolvers = {
       });
     })),
 
-    addSchoolEvent: async(obj, args, context) => doMongo(async(db, err) => new Promise((res, rej) => {
+    addSchoolEvent: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOL_EVENTS).insert(args, (err, result) => {
         if (err) console.error(error);
         else console.log(result);
@@ -74,7 +74,7 @@ const resolvers = {
   },
 
   School: {
-    events: async(school) => doMongo(async(db, err) => new Promise((res, rej) => {
+    events: async(school) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOL_EVENTS).find({ schoolName: school.name }).toArray((err, docs) => {
         if (err) console.error(err);
         else console.log(docs);
@@ -82,8 +82,8 @@ const resolvers = {
       });
     })),
 
-    students: async(school) => doMongo(async(db, err) => new Promise((res, rej) => {
-      db.collection(SCHOOL_EVENTS).find({ schoolName: school.name }).toArray((err, docs) => {
+    students: async(school) => doMongo(async(db) => new Promise((res, rej) => {
+      db.collection(USERS).find({ schoolName: school.name }).toArray((err, docs) => {
         if (err) console.error(err);
         else console.log(docs);
         return res(docs);
@@ -92,8 +92,8 @@ const resolvers = {
   },
 
   User: {
-    school: async(user) => doMongo(async(db, err) => new Promise((res, rej) => {
-      db.collection(SCHOOLS).find({ name: user.currentSchoolName }).toArray((err, docs) => {
+    school: async(user) => doMongo(async(db) => new Promise((res, rej) => {
+      db.collection(SCHOOLS).find({ name: user.schoolName }).toArray((err, docs) => {
         if (err) console.error(err);
         else console.log(docs);
         return res(docs);

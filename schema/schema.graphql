@@ -5,6 +5,8 @@ type Query {
 }
 
 type Mutation {
+
+  "Mutation to add single user"
   addUser(
     firstName: String,
     lastName: String,
@@ -19,9 +21,13 @@ type Mutation {
     major: String,
 
     "This is the current school name of the user"
-    currentSchoolName: String
+    schoolName: String
   ): Query
+
+  "Add resource to db"
   addResources(names: [String!]!, links: [String!]!): Query
+
+  "Mutation to add single school"
   addSchool(name: String!, type: SchoolType!, registrationDeadline: String!): Query
   addSchoolEvent(schoolName: String!, link: String!, name: String!, description: String!, deadline: String!): Query
 }
@@ -47,7 +53,7 @@ type User {
   "This is the school of the user"
   school: School
 
-  currentSchoolName: String
+  schoolName: String
 }
 
 enum SchoolType {
