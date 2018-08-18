@@ -53,7 +53,7 @@ type User {
   desiredMajor: String
 
   "List of items this person should do in order to best be ready"
-  checklist: [UserEvents!]!
+  checklist: [UserEvent!]!
 
   "This is the school of the user"
   school: School
@@ -85,6 +85,7 @@ type Resource {
   link: String!
   tag: String
 
+  schoolName: String
   school: School
 }
 
