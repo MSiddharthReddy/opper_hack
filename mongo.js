@@ -1,7 +1,8 @@
 const MongoClient = require('mongodb').MongoClient;
+const config = require('./config.json');
 
 // Connection URL
-const url = 'mongodb://hacker:iloveicecream1@ds125912.mlab.com:25912/opeertunity_hack';
+const url = config.mongoURL;
 
 // Database Name
 const dbName = 'myproject';

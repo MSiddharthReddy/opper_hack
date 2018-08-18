@@ -9,6 +9,9 @@ const doMongo = require('./mongo.js');
 // which ways the data can be fetched from the GraphQL server.
 const typeDefs = gql(schema);
 
+
+const USERS ='users';
+
 // Resolvers define the technique for fetching the types in the
 // schema.  We'll retrieve books from the "books" array above.
 const resolvers = {
@@ -23,6 +26,35 @@ const resolvers = {
   Mutation: {
     addResources: async(obj, args, context) => {
       const result = args.names.reduce
+    },
+    addUser: async(obj, args, context) => {
+      const {
+        name,
+        age,
+        email,
+        inCollege,
+        address,
+        major
+      } = args;
+
+      doMongo((db, err) => {
+        if(err) {
+          console.log(err);
+          return;
+        }
+
+        USERS.insert({
+          name,
+          age,
+          email,
+          inCollege,
+          address,
+          major
+        });
+
+      });
+
+      return {};
     }
   },
 };
