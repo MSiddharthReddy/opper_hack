@@ -131,7 +131,7 @@ app.post('/registration-form', (req, res) => {
 const server = new ApolloServer({ typeDefs, resolvers });
 server.applyMiddleware({app});
 
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 4000;
 app.listen({ port }, () => {
-  console.log(`🚀  Server ready at 80`);
+  console.log(`🚀  Server ready at 4000`);
 });
