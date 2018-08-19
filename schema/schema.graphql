@@ -41,6 +41,8 @@ type User {
   lastName: String
   age: Int
   email: String
+  gender: String
+  password: String
 
   "This is the current level of school this person is in"
   schoolState: SchoolType

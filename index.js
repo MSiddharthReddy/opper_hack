@@ -81,7 +81,15 @@ const resolvers = {
       });
     })),
 
-    addSchoolEvent: async(obj, args) => doMongo(async(db) => new Promise((res, rej) => {
+    addUserDesiredSchool: async(obj, args, context) => doMongo(async (db) => {
+      const collection = db.collection(USERS);
+      let user = await collection.find({email: args.userEmail}).toArray() || [];
+
+      user.desiredSchoolNames = user.desiredSchoolNames || [];
+      user.desiredSchoolNames.push(args.schoolName);
+  await collection.updateOne({ email: args.userEmail }, { $set: { desiredSchoolNames: user.desiredSchoolNames } }, { upsert: true});
+    
+    addSchoolEvent: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOL_EVENTS).updateOne({ name: args.name, schoolName: args.schoolName },
         { $set: args }, { upsert: true }, (err, result) => {
         if (err) console.error(error);
@@ -91,7 +99,7 @@ const resolvers = {
     })),
 
     addResourceTag: async(obj, args) => doMongo(async(db, err) => new Promise((res, rej) => {
-      db.collection(RESOURCE_TAGS).insertOne(args, (err, result) => {
+      db.collection(RESOURCE_TAGS).updateOne({ name: args.name }, { $set: args},{ upsert: true}, (err, result) => {
         if (err) console.error(err);
         else console.log(result);
         return res({});
