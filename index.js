@@ -25,12 +25,13 @@ const filterUndefined = (obj) => Object.keys(obj).reduce((acc, n) => {
 const resolvers = {
   Query: {
     users: async(obj, args) => doMongo(async(db) => new Promise((res, rej) => {
-        db.collection(USERS).find({ email: args.email }).toArray((err, docs) => {
-          if (err) console.error(err);
-          else console.log(docs);
-          return res(docs);
-        });
-      })),
+      db.collection(USERS).find(filterUndefined({ email: args.email })).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        if (!args.desiredSchoolName) return res(docs);
+        return res(docs.filter(it => it.desiredSchoolNames && it.desiredSchoolNames.includes(args.desiredSchoolName)));
+      });
+    })),
 
     schools: async(obj, args) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOLS).find(filterUndefined({ name: args.name, type: args.schoolType })).toArray((err, docs) => {

@@ -1,5 +1,5 @@
 type Query {
-  users(email: String): [User!]
+  users(email: String, desiredSchoolName: String): [User!]
   resources(name: String): [Resource]
   schools(name: String, type: SchoolType): [School]
 }
