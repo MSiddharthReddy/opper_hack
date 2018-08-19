@@ -25,8 +25,6 @@ const filterUndefined = (obj) => Object.keys(obj).reduce((acc, n) => {
 const resolvers = {
   Query: {
     users: async(obj, args) => doMongo(async(db) => new Promise((res, rej) => {
-
-      if
         db.collection(USERS).find({ email: args.email }).toArray((err, docs) => {
           if (err) console.error(err);
           else console.log(docs);
