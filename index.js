@@ -1,7 +1,6 @@
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 const fs = require('fs');
-const cors = require('cors');
 const bodyParser = require('body-parser');
 
 schema = fs.readFileSync('./schema/schema.graphql').toString();
@@ -125,7 +124,6 @@ const resolvers = {
 
 const app = express();
 
-app.use(cors());
 app.use(bodyParser.text({ type: 'application/graphql' }));
 
 const server = new ApolloServer({ typeDefs, resolvers });
