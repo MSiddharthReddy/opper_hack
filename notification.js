@@ -28,7 +28,7 @@ const findEvents = event => {
     const today = new Date();
     const timeDiff = Math.abs(today - new Date(events[0].deadline));
     const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    if(diffDays === 1)
+    if(diffDays === 1) {
     // setup e-mail data with unicode symbols
     let mailOptions = {
         from: '"Joshua" <Joshua@f-Connect.com>', // sender address
@@ -44,6 +44,7 @@ const findEvents = event => {
         }
         console.log('Message sent: ' + info.response);
     });
+  }
 
   });
 }
