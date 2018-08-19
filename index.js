@@ -101,7 +101,7 @@ const resolvers = {
     })),
 
     addResourceTag: async(obj, args) => doMongo(async(db, err) => new Promise((res, rej) => {
-      db.collection(RESOURCE_TAGS).updateOne({ name: args.name }, { $set: args},{ upsert: true} (err, result) => {
+      db.collection(RESOURCE_TAGS).updateOne({ name: args.name }, { $set: args},{ upsert: true}, (err, result) => {
         if (err) console.error(err);
         else console.log(result);
         return res({});
