@@ -1,52 +1,27 @@
 const nodemailer = require('nodemailer');
 const config = require('./config.json');
 
-async function main() {
-    // Generate SMTP service account from ethereal.email
-
-    console.log('Credentials obtained, sending message...');
-
-    // NB! Store the account object values somewhere if you want
-    // to re-use the same account for future mail deliveries
-
-    // Create a SMTP transporter object
-    let transporter = nodemailer.createTransport(smtpTransport({
+var transporter = nodemailer.createTransport({
     host: 'mail.gmx.com',
-    port: 587,
+    port: 465,
     secure: true,
-    auth: {
-        user: config.email,
-        pass: config.pass
-    }
-}));
+  auth: {
+    user: 'person_the@gmx.com',
+    pass: 'opportunity_hack2018'
+  }
+});
 
-    // Message object
-    let message = {
-        // Comma separated list of recipients
-        to: 'siddharthreddy <siddu1512@gmail.com>',
+var mailOptions = {
+  from: 'siddu1512@gmail.com',
+  to: 'siddu1512@gmail.com',
+  subject: 'Sending Email using Node.js',
+  text: 'That was easy!'
+};
 
-        // Subject of the message
-        subject: 'Nodemailer is unicode friendly ✔',
-
-        // plaintext body
-        text: 'Hello to myself!',
-
-        // HTML body
-        html:
-            '<p><b>Hello</b> to myself <img src="cid:note@example.com"/></p>' +
-            '<p>Here\'s a nyan cat for you as an embedded attachment:<br/></p>',
-    };
-
-    let info = await transporter.sendMail(message);
-
-    console.log('Message sent successfully!');
-    console.log(nodemailer.getTestMessageUrl(info));
-
-    // only needed when using pooled connections
-    transporter.close();
-}
-
-main().catch(err => {
-    console.log('Error', err.message);
-    process.exit(1);
+transporter.sendMail(mailOptions, function(error, info){
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email sent: ' + info.response);
+  }
 });
