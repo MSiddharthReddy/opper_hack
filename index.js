@@ -1,10 +1,7 @@
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 const fs = require('fs');
-<<<<<<< HEAD
-=======
 const cors = require('cors');
->>>>>>> 74da1c668312c2c8dd26735f15067e99cfcd2ac0
 const bodyParser = require('body-parser');
 
 schema = fs.readFileSync('./schema/schema.graphql').toString();
@@ -28,7 +25,7 @@ const filterUndefined = (obj) => Object.keys(obj).reduce((acc, n) => {
 const resolvers = {
   Query: {
     users: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
-        db.collection(USERS).find({ name: }).toArray((err, docs) => {
+        db.collection(USERS).find({ email: args.email }).toArray((err, docs) => {
           if (err) console.error(err);
           else console.log(docs);
           return res(docs);
@@ -132,7 +129,7 @@ const resolvers = {
         else console.log(docs);
         return res(docs);
       });
-    }));
+    }))
   },
 
   Resource: {
