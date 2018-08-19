@@ -1,6 +1,7 @@
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 const fs = require('fs');
+const cors = require('cors');
 schema = fs.readFileSync('./schema/schema.graphql').toString();
 
 const doMongo = require('./mongo.js');
@@ -138,7 +139,7 @@ const resolvers = {
 
 const app = express();
 
-
+app.use(cors());
 const server = new ApolloServer({ typeDefs, resolvers });
 server.applyMiddleware({app});
 
