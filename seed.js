@@ -8,7 +8,7 @@ const randomElem = arr => arr[~~(Math.random() * arr.length)];
 
 // Generates users
 // doMongo(async(db) => {
-//   for (let i = 0; i < 100; i ++) {
+//   for (let i = 0; i < 177; i ++) {
 //     await db.collection('users').insertOne({
 //       firstName: faker.name.firstName(),
 //       lastName: faker.name.lastName(),
@@ -16,6 +16,7 @@ const randomElem = arr => arr[~~(Math.random() * arr.length)];
 //       address: faker.address.streetAddress(),
 //       schoolState: 'COLLEGE',
 //       schoolName: randomElem(univs).name,
+//       desiredSchoolNames: [randomElem(univs).name, randomElem(univs).name],
 //     });
 //   }
 // });

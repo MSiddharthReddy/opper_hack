@@ -111,11 +111,13 @@ const resolvers = {
       return db.collection(USER_EVENTS).find({ userEmail: user.email }).toArray()
     }),
 
-    desiredSchools: async(user) => doMongo(async(db) => {
-      const schools = db.collection(SCHOOLS).find({ }).toArray();
+    desiredSchoolNames: user => user.desiredSchoolNames || [],
 
+    desiredSchools: async(user) => doMongo(async(db) => {
+      const schools = await db.collection(SCHOOLS).find({ }).toArray();
+      
       // TODO optimize
-      return schools.filter(it => user.desiredSchoolNames.includes(it.name));
+      return schools.filter(it => (user.desiredSchoolNames || []).includes(it.name));
     }),
   },
 
