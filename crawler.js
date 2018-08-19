@@ -2,40 +2,40 @@ const scraper = require('google-search-scraper');
 const doMongo = require('./mongo.js');
 
 const RESOURCES = 'resources';
-const USET_EVENTS = 'userEvents';
+const RESOURCE_TAGS = 'resourceTags';
 
-doMongo(async(db, err) => {
-  const userEvents = await db.collection(USET_EVENTS).find().toArray();;
-  console.log('User Events', userEvent)
-});
-
-
-
-let options = {
-  query: 'Foster Resources',
-  limit: 25
+module.exports = () => {
+  doMongo(async(db, err) => {
+    const resourceTags = await db.collection(RESOURCE_TAGS).find().toArray();
+    resourceTags.map( resource => {
+      let options = {
+        query: resource.name,
+        limit: 25,
+      }
+      search(options);
+    })
+  });
 };
 
-let titles = [];
-let urls = [];
-
-const search(options) {
+const search = (options) => {
   scraper.search(options, function(err, url, meta) {
+    console.log("in the search", options)
     // This is called for each result
-    if(err) throw err;
+    if(err) console.error(err);
     doMongo(async(db, err) => new Promise((res, rej) => {
       db.collection(RESOURCES).updateOne({
         link: url
       },
       {$set: {
         name: meta.title,
-        link: url
+        link: url,
+        tag: options.query
       }}, {
         upsert: true
       },
        (err, result) => {
         if (err) console.error(err);
-        else console.log(result);
+        console.log('yaya')
         return res({});
       });
     }))
