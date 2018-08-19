@@ -1,22 +1,68 @@
+"Root query field for this schema"
 type Query {
-  users(email: String, desiredSchoolName: String): [User!]
-  resources(name: String): [Resource]
-  schools(name: String, type: SchoolType, num: Int): [School]
+
+  """
+  Root user field for this schema
+
+  Passing email will select users with the given email
+  Passing a desired school name will return all users who also want to go to that school
+  Limit and Skip are used to implement pagination on the client side.
+
+  Always returns 0 or more users
+  """
+  users(email: String, desiredSchoolName: String, skip: Int, limit: Int): [User!]!
+
+  """
+  List of resources for users of the app
+
+  Passing a name in will select only resources with the given name
+  Limit and Skip are used to implement pagination on the client side.
+
+  Always returns 0 or more resources
+  """
+  resources(name: String, skip: Int, limit: Int): [Resource!]!
+
+  """
+  List of schools for user of the app
+
+  Passing in a name will only return schools with that name
+  Passing in a type will only return schools of that type
+
+  Limit and Skip are used to implement pagination on the client side.
+
+  Always returns 0 or more schools
+  """
+  schools(name: String, type: SchoolType, skip: Int, limit: Int): [School!]!
 }
 
+"Root mutation field for this schema"
 type Mutation {
 
   "Mutation to add single user"
   addUser(
+
+    "Given name aka first name of the user"
     firstName: String
+
+    "Family name aka last name of the user"
     lastName: String
+
+    "The users age rounded."
     age: Int
+
+    "Users gender, not implemented as an enum since a user might want to define their own."
     gender: String
+
+    "The users password, please encrypt before sending"
     password: String
 
+    "The email of the user. Required"
     email: String!
+
+    "The street address of the user, if so permitted"
     address: String
 
+    "What type of school this user is currently in"
     schoolState: SchoolType
 
     "This can be either the desired major if the person is not in college or it can be desired major"
@@ -60,28 +106,40 @@ type User {
 
   "List of items this person should do in order to best be ready"
   checklist: [UserEvent!]!
-  "This is the school of the user"
+  "Current school of the user, provided by the user"
   school: School
 
+  "The name of the school the user currently attends"
   schoolName: String
 
+  "A list of schools the user would like to go to"
   desiredSchoolNames: [String!]!
   desiredSchools: [School!]!
 }
 
+"Different types of schools"
 enum SchoolType {
+  "College represents any higher education"
   COLLEGE
+
+  "Only high school"
   HIGH_SCHOOL
+
+  "Only Middle school"
   MIDDLE_SCHOOL
+
+  "Any other sort of education that someone might be in"
   OTHER
 }
 
 
+"Represents a school"
 type School {
   name: String
   type: SchoolType
   events: [Event!]!
 
+  "List of students who attend this school"
   students: [User!]!
 }
 
