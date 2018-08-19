@@ -122,16 +122,19 @@ const resolvers = {
 
 const app = express();
 
+app.use(cors());
+app.use(bodyParser.text({ type: 'application/graphql' }));
+
+const server = new ApolloServer({ typeDefs, resolvers });
+server.applyMiddleware({app});
+
 app.post('/registration-form', (req, res) => {
   console.log(req.body);
 
   res.status(200).end();
 });
 
-const server = new ApolloServer({ typeDefs, resolvers });
-server.applyMiddleware({app});
-
 const port = process.env.PORT || 4000;
 app.listen({ port }, () => {
-  console.log(`🚀  Server ready at 4000`);
+  console.log(`🚀  Server ready at ${port}`);
 });
