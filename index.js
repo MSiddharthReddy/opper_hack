@@ -2,6 +2,8 @@ const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 const fs = require('fs');
 const cors = require('cors');
+const bodyParser = require('body-parser');
+
 schema = fs.readFileSync('./schema/schema.graphql').toString();
 
 const doMongo = require('./mongo.js');
