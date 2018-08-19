@@ -4,8 +4,8 @@ const config = require('./config.json');
 var transporter = nodemailer.createTransport({
   service: 'FastMail',
   auth: {
-    user: 'test_person@fastmail.com',
-    pass: 'opportunity_hack2018'
+    user: config.email,
+    pass: config.pass
   }
 });
 
