@@ -17,6 +17,8 @@ const SCHOOL_EVENTS = 'schoolEvents';
 const RESOURCE_TAGS = 'resourceTags';
 const USER_EVENTS = 'userEvents';
 
+// console.log = () => {}
+
 const filterUndefined = (obj) => Object.keys(obj).reduce((acc, n) => {
   if (obj[n] !== undefined) acc[n] = obj[n];
   return acc;
@@ -76,7 +78,6 @@ const resolvers = {
     addSchool: async(obj, args) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOLS).updateOne({ name: args.name }, { $set: args }, { upsert: true}, (err, result) => {
         if (err) console.error(err);
-        else console.log(result);
         return res({});
       });
     })),
@@ -128,21 +129,12 @@ const resolvers = {
   },
 
   User: {
-    school: async(user) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOLS).find({ name: user.schoolName }).toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        return res(docs);
-      });
-    })),
+    school: async(user) => doMongo(async(db) => db.collection(SCHOOLS).findOne({ name: user.schoolName })),
 
-    checklist: async(user) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(USER_EVENTS).find({ userEmail: user.email }).toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        return res(docs);
-      });
-    })),
+    checklist: async(user) => doMongo(async(db) => {
+      if (!user.email) return [];
+      return db.collection(USER_EVENTS).find({ userEmail: user.email }).toArray()
+    }),
 
     desiredSchools: async(user) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOLS).find({ name: [] })
@@ -168,13 +160,8 @@ const resolvers = {
       });
     })),
 
-    event: async(userEvent) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOL_EVENTS).find({ name: userEvent.eventName }).toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        return res(docs);
-      });
-    })),
+    event: async(userEvent) => doMongo(async(db) =>
+      db.collection(SCHOOL_EVENTS).findOne({ name: userEvent.eventName })),
   },
 };
 

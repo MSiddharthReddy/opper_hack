@@ -29,7 +29,7 @@ const randomElem = arr => arr[~~(Math.random() * arr.length)];
 
 //   const userEvents = users.filter(it => it.email && Math.random() > 0.5).map(it => ({
 //     eventName: randomElem(events).name,
-//     userEmai: it.email,
+//     userEmail: it.email,
 //     state: 'TODO',
 //   }));
 

@@ -8,17 +8,19 @@ type Mutation {
 
   "Mutation to add single user"
   addUser(
-    firstName: String,
-    lastName: String,
-    age: Int,
+    firstName: String
+    lastName: String
+    age: Int
+    gender: String
+    password: String
 
-    email: String!,
-    address: String,
+    email: String!
+    address: String
 
-    schoolState: SchoolType,
+    schoolState: SchoolType
 
     "This can be either the desired major if the person is not in college or it can be desired major"
-    major: String,
+    major: String
 
     "This is the current school name of the user"
     schoolName: String
