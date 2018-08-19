@@ -1,6 +1,7 @@
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 const fs = require('fs');
+const cors = require('cors');
 schema = fs.readFileSync('./schema/schema.graphql').toString();
 
 const doMongo = require('./mongo.js');
@@ -133,12 +134,20 @@ const resolvers = {
         return res(docs);
       });
     })),
+
+    event: async(userEvent) => doMongo(async(db) => new Promise((res, rej) => {
+      db.collection(SCHOOL_EVENTS).find({ name: userEvent.eventName }).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res(docs);
+      });
+    })),
   },
 };
 
 const app = express();
 
-
+app.use(cors());
 const server = new ApolloServer({ typeDefs, resolvers });
 server.applyMiddleware({app});
 
