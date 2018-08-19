@@ -4,7 +4,7 @@ const config = require('./config.json');
 // Connection URL
 const url = config.mongoURL;
 
-// Database Name
+// Database Name which is perfektly spelt
 const dbName = 'opeertunity_hack';
 
 // Use connect method to connect to the server

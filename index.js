@@ -59,12 +59,8 @@ const resolvers = {
     addUser:async(obj, args) => 
       doMongo(async(db, err) => db.collection(USERS).insertOne(args)),
 
-    addSchool: async(obj, args) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOLS).updateOne({ name: args.name }, { $set: args }, { upsert: true}, (err, result) => {
-        if (err) console.error(err);
-        return res({});
-      });
-    })),
+    addSchool: async(obj, args) => doMongo(async(db) =>
+      db.collection(SCHOOLS).updateOne({ name: args.name }, { $set: args }, { upsert: true })),
 
     addUserDesiredSchool: async(obj, args, context) => doMongo(async (db) => {
       const collection = db.collection(USERS);
@@ -76,14 +72,12 @@ const resolvers = {
       return {};
     }),
 
-    addSchoolEvent: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOL_EVENTS).updateOne({ name: args.name, schoolName: args.schoolName },
-        { $set: args }, { upsert: true }, (err, result) => {
-        if (err) console.error(error);
-        else console.log(result);
-        return res({});
-      });
-    })),
+    addSchoolEvent: async(obj, args, context) => doMongo(async(db) =>
+      db.collection(SCHOOL_EVENTS).updateOne(
+        { name: args.name, schoolName: args.schoolName },
+        { $set: args },
+        { upsert: true },
+      )),
 
     addResourceTag: async(obj, args) => doMongo(async(db) =>
       db.collection(RESOURCE_TAGS).updateOne({ name: args.name }, { $set: args }, { upsert: true })),
@@ -100,13 +94,8 @@ const resolvers = {
   },
 
   School: {
-    events: async(school) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOL_EVENTS).find({ schoolName: school.name }).toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        return res(docs);
-      });
-    })),
+    events: async(school) => doMongo(async(db) =>
+      db.collection(SCHOOL_EVENTS).find({ schoolName: school.name }).toArray()),
 
     students: async(school) => doMongo(async(db) =>
       db.collection(USERS).find({ schoolName: school.name }).toArray()),
