@@ -3,10 +3,9 @@ const { ApolloServer, gql } = require('apollo-server-express');
 const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const crawler = require('./crawler');
+// const crawler = require('./crawler');
 
-setInterval(crawler, 36000000);
-
+// setInterval(crawler, 36000000);
 
 schema = fs.readFileSync('./schema/schema.graphql').toString();
 
@@ -21,8 +20,6 @@ const SCHOOL_EVENTS = 'schoolEvents';
 const RESOURCE_TAGS = 'resourceTags';
 const USER_EVENTS = 'userEvents';
 
-// console.log = () => {}
-
 const filterUndefined = (obj) => Object.keys(obj).reduce((acc, n) => {
   if (obj[n] !== undefined) acc[n] = obj[n];
   return acc;
@@ -30,32 +27,28 @@ const filterUndefined = (obj) => Object.keys(obj).reduce((acc, n) => {
 
 const resolvers = {
   Query: {
-    users: async(obj, args) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(USERS).find(filterUndefined({ email: args.email })).toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        if (!args.desiredSchoolName) return res(docs);
-        return res(docs.filter(it => it.desiredSchoolNames && it.desiredSchoolNames.includes(args.desiredSchoolName)));
-      });
-    })),
+    users: async(obj, args) => doMongo(async(db) => {
+      let users = await db.collection(USERS).find(filterUndefined({ email: args.email }));
+      if (args.limit || args.limit === 0) users = users.limit(args.limit);
+      if (args.skip || args.skip === 0) schools = schools.skip(args.skip);
+      users = await users.toArray();
+      if (!args.desiredSchoolNames) return users;
+      return users.filter(it => it.desiredSchoolNames && it.desiredSchoolNames.includes(args.desiredSchoolName));
+    }),
 
-    schools: async(obj, args) => doMongo(async(db) => new Promise((res, rej) => {
-      let temp = db.collection(SCHOOLS).find(filterUndefined({ name: args.name, type: args.schoolType }));
-      if (args.num || args.num === 0) temp = temp.count(args.num);
-      temp.toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        return res(docs);
-      });
-    })),
+    schools: async(obj, args) => doMongo(async(db) => {
+      let schools = db.collection(SCHOOLS).find(filterUndefined({ name: args.name, type: args.schoolType }));
+      if (args.limit || args.limit === 0) schools = schools.limit(args.limit);
+      if (args.skip || args.skip === 0) schools = schools.skip(args.skip);
+      return schools.toArray();
+    }),
 
-    resources: async() => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(RESOURCES).find({}).toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        return res(docs);
-      });
-    })),
+    resources: async(query, args) => doMongo(async(db) => {
+      let resources = db.collection(RESOURCES).find({});
+      if (args.limit || args.limit === 0) resources = resources.limit(args.limit);
+      if (args.skip || args.skip === 0) resources = resources.skip(args.skip);
+      return resources.toArray();
+    }),
   },
 
   Mutation: {
@@ -64,13 +57,7 @@ const resolvers = {
         acc.concat({ name, link: args.links[index] }),
       []);
 
-      return doMongo(async(db) => new Promise((res, rej) => {
-        db.collection(RESOURCES).insertMany(result, (err, result) => {
-          if (err !== null) console.error(err);
-          else console.log(result);
-          return res(result);
-        });
-      }));
+      return doMongo(async(db) => db.collection(RESOURCES).insertMany(result));
     },
     addUser:async(obj, args) => doMongo(async(db, err) => new Promise((res, rej) => {
      db.collection(USERS).insertOne(args, (err, result) => {
@@ -105,13 +92,10 @@ const resolvers = {
       });
     })),
 
-    addResourceTag: async(obj, args) => doMongo(async(db, err) => new Promise((res, rej) => {
-      db.collection(RESOURCE_TAGS).updateOne({ name: args.name }, { $set: args},{ upsert: true}, (err, result) => {
-        if (err) console.error(err);
-        else console.log(result);
-        return res({});
-      });
-    })),
+    addResourceTag: async(obj, args) => doMongo(async(db) => {
+      await db.collection(RESOURCE_TAGS).updateOne({ name: args.name }, { $set: args }, { upsert: true });
+      return {};
+    }),
   },
 
   School: {
@@ -123,13 +107,8 @@ const resolvers = {
       });
     })),
 
-    students: async(school) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(USERS).find({ schoolName: school.name }).toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        return res(docs);
-      });
-    }))
+    students: async(school) => doMongo(async(db) =>
+      db.collection(USERS).find({ schoolName: school.name }).toArray()),
   },
 
   User: {
@@ -140,29 +119,22 @@ const resolvers = {
       return db.collection(USER_EVENTS).find({ userEmail: user.email }).toArray()
     }),
 
-    desiredSchools: async(user) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOLS).find({ name: [] })
-    })),
+    desiredSchools: async(user) => doMongo(async(db) => {
+      const schools = db.collection(SCHOOLS).find({ }).toArray();
+
+      // TODO optimize
+      return schools.filter(it => user.desiredSchoolNames.includes(it.name));
+    }),
   },
 
   Resource: {
-    school: async(resource) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOLS).find({ name: resource.schoolName }).toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        return res(docs);
-      });
-    }))
+    school: async(resource) => doMongo(async(db) =>
+      db.collection(SCHOOLS).findOne({ name: resource.schoolName })),
   },
 
   UserEvent: {
-    user: async(userEvent) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(USERS).find({ email: userEvent.userEmail }).toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        return res(docs);
-      });
-    })),
+    user: async(userEvent) => doMongo(async(db) =>
+      db.collection(USERS).findOne({ email: userEvent.userEmail })),
 
     event: async(userEvent) => doMongo(async(db) =>
       db.collection(SCHOOL_EVENTS).findOne({ name: userEvent.eventName })),
