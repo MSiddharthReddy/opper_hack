@@ -1,7 +1,7 @@
 type Query {
   users(email: String, desiredSchoolName: String): [User!]
   resources(name: String): [Resource]
-  schools(name: String, type: SchoolType): [School]
+  schools(name: String, type: SchoolType, num: Int): [School]
 }
 
 type Mutation {
@@ -12,7 +12,7 @@ type Mutation {
     lastName: String,
     age: Int,
 
-    email: String,
+    email: String!,
     address: String,
 
     schoolState: SchoolType,

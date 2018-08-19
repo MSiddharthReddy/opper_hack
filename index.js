@@ -38,7 +38,9 @@ const resolvers = {
     })),
 
     schools: async(obj, args) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOLS).find(filterUndefined({ name: args.name, type: args.schoolType })).toArray((err, docs) => {
+      let temp = db.collection(SCHOOLS).find(filterUndefined({ name: args.name, type: args.schoolType }));
+      if (args.num || args.num === 0) temp = temp.count(args.num);
+      temp.toArray((err, docs) => {
         if (err) console.error(err);
         else console.log(docs);
         return res(docs);
@@ -69,8 +71,7 @@ const resolvers = {
       }));
     },
     addUser:async(obj, args) => doMongo(async(db, err) => new Promise((res, rej) => {
-      console.log('New Mutation', args);
-     db.collection(USERS).insert(args, (err, result) => {
+     db.collection(USERS).insertOne(args, (err, result) => {
        if (err) console.error(err);
        else console.log(result);
        return res({});
@@ -92,8 +93,7 @@ const resolvers = {
       user.desiredSchoolNames.push(args.schoolName);
       await collection.updateOne({ email: args.userEmail }, { $set: { desiredSchoolNames: user.desiredSchoolNames } }, { upsert: true});
       return {};
-      })
-    ,
+    }),
 
     addSchoolEvent: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOL_EVENTS).updateOne({ name: args.name, schoolName: args.schoolName },
