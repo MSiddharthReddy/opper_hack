@@ -164,5 +164,5 @@ app.post('/registration-form', (req, res) => {
 
 const port = process.env.PORT || 4000;
 app.listen({ port }, () => {
-  console.log(`🚀  Server ready at ${port}`);
+  console.log(`🚀  Server ready at ${port}, graphql path: ${server.graphqlPath}`);
 });
