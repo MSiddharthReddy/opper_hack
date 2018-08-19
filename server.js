@@ -134,6 +134,14 @@ const resolvers = {
         return res(docs);
       });
     })),
+
+    event: async(userEvent) => doMongo(async(db) => new Promise((res, rej) => {
+      db.collection(SCHOOL_EVENTS).find({ name: userEvent.eventName }).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res(docs);
+      });
+    })),
   },
 };
 
