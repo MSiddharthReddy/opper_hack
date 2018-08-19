@@ -30,7 +30,7 @@ const resolvers = {
     users: async(obj, args) => doMongo(async(db) => {
       let users = await db.collection(USERS).find(filterUndefined({ email: args.email }));
       if (args.limit || args.limit === 0) users = users.limit(args.limit);
-      if (args.skip || args.skip === 0) schools = schools.skip(args.skip);
+      if (args.skip || args.skip === 0) users = users.skip(args.skip);
       users = await users.toArray();
       if (!args.desiredSchoolNames) return users;
       return users.filter(it => it.desiredSchoolNames && it.desiredSchoolNames.includes(args.desiredSchoolName));
@@ -52,26 +52,15 @@ const resolvers = {
   },
 
   Mutation: {
-    addResources: async(obj, args) => {
-      const result = args.names.reduce((acc, name, index) =>
-        acc.concat({ name, link: args.links[index] }),
-      []);
+    addResources: async(obj, args) => doMongo(async(db) =>
+      db.collection(RESOURCES).insertMany(args.names.reduce((acc, name, index) =>
+      acc.concat({ name, link: args.links[index] }), []))),
 
-      return doMongo(async(db) => db.collection(RESOURCES).insertMany(result));
-    },
-    addUser:async(obj, args) => doMongo(async(db, err) => new Promise((res, rej) => {
-     db.collection(USERS).insertOne(args, (err, result) => {
-       if (err) console.error(err);
-       else console.log(result);
-       return res({});
-     });
-   })),
-    addSchool: async(obj, args) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOLS).updateOne({ name: args.name }, { $set: args }, { upsert: true}, (err, result) => {
-        if (err) console.error(err);
-        return res({});
-      });
-    })),
+    addUser:async(obj, args) => 
+      doMongo(async(db, err) => db.collection(USERS).insertOne(args)),
+
+    addSchool: async(obj, args) => doMongo(async(db) =>
+      db.collection(SCHOOLS).updateOne({ name: args.name }, { $set: args }, { upsert: true })),
 
     addUserDesiredSchool: async(obj, args, context) => doMongo(async (db) => {
       const collection = db.collection(USERS);
@@ -83,29 +72,30 @@ const resolvers = {
       return {};
     }),
 
-    addSchoolEvent: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOL_EVENTS).updateOne({ name: args.name, schoolName: args.schoolName },
-        { $set: args }, { upsert: true }, (err, result) => {
-        if (err) console.error(error);
-        else console.log(result);
-        return res({});
-      });
-    })),
+    addSchoolEvent: async(obj, args, context) => doMongo(async(db) =>
+      db.collection(SCHOOL_EVENTS).updateOne(
+        { name: args.name, schoolName: args.schoolName },
+        { $set: args },
+        { upsert: true },
+      )),
 
-    addResourceTag: async(obj, args) => doMongo(async(db) => {
-      await db.collection(RESOURCE_TAGS).updateOne({ name: args.name }, { $set: args }, { upsert: true });
-      return {};
-    }),
+    addResourceTag: async(obj, args) => doMongo(async(db) =>
+      db.collection(RESOURCE_TAGS).updateOne({ name: args.name }, { $set: args }, { upsert: true })),
+
+    updateUserEvent: async(mutation, args) => doMongo(async(db) => 
+      db.collection(USER_EVENTS).updateOne({ eventName: args.eventName, userEmail: args.userEmail }, {
+        $set: { state: args.state },
+      }, { upsert: false })),
+
+    createEvent: async(mutation, args) => doMongo(async(db) => db.collection(SCHOOL_EVENTS).insertOne(args)),
+
+    associateEventWithUser: async(mutation, args) => doMongo(async(db) =>
+      db.collection.updateOne(args, { $set: args}, { upsert: true })),
   },
 
   School: {
-    events: async(school) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOL_EVENTS).find({ schoolName: school.name }).toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        return res(docs);
-      });
-    })),
+    events: async(school) => doMongo(async(db) =>
+      db.collection(SCHOOL_EVENTS).find({ schoolName: school.name }).toArray()),
 
     students: async(school) => doMongo(async(db) =>
       db.collection(USERS).find({ schoolName: school.name }).toArray()),

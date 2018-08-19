@@ -82,6 +82,26 @@ type Mutation {
 
   "Set user desired school to school with given name"
   addUserDesiredSchool(userEmail: String!, schoolName: String!): Query
+
+  "Update a user event state for event with given name and for user with given email"
+  updateUserEvent(userEmail: String!, state: UserEventState!, eventName: String!): Query
+
+  "Create an event which can later be associated with a user for a user event"
+  createEvent(
+    link: String
+    name: String!
+    description: String
+    deadline: String
+
+    school: School
+    schoolName: String
+  ): Query
+
+  "Associates a given event with a user so that they should fulfill it"
+  associateEventWithUser(
+    userEmail: String!
+    eventName: String!
+  ): Query
 }
 
 type User {
@@ -106,6 +126,7 @@ type User {
 
   "List of items this person should do in order to best be ready"
   checklist: [UserEvent!]!
+
   "Current school of the user, provided by the user"
   school: School
 
@@ -167,9 +188,10 @@ type UserEvent {
   state: UserEventState
 }
 
+"Represents an item that a user should complete to get into college"
 type Event {
   link: String
-  name: String
+  name: String!
   description: String
   deadline: String
   school: School
