@@ -4,8 +4,10 @@ const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const crawler = require('./crawler');
+const notification = require('./notification');
 
 setInterval(crawler, 36000000);
+setInterval(notification, 36000000);
 
 schema = fs.readFileSync('./schema/schema.graphql').toString();
 
