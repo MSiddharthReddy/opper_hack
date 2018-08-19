@@ -3,9 +3,9 @@ const { ApolloServer, gql } = require('apollo-server-express');
 const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-// const crawler = require('./crawler');
+const crawler = require('./crawler');
 
-// setInterval(crawler, 36000000);
+setInterval(crawler, 36000000);
 
 schema = fs.readFileSync('./schema/schema.graphql').toString();
 

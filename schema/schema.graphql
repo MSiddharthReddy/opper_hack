@@ -93,7 +93,6 @@ type Mutation {
     description: String
     deadline: String
 
-    school: School
     schoolName: String
   ): Query
 
