@@ -1,6 +1,6 @@
 const faker = require('faker');
 const univ = require('./universities');
-const univs = univ.map(it => ({ name: it.name, type: 'COLLEGE'}));
+const univs = univ.map(it => ({ name: it.name, type: 'COLLEGE', websites: it.web_pages }));
 const doMongo = require('./mongo');
 
 const randomElem = arr => arr[~~(Math.random() * arr.length)];

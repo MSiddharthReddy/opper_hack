@@ -158,6 +158,9 @@ type School {
   "The name of this school"
   name: String
 
+  "Website for this school"
+  websites: [String!]!
+
   "What kind of school this"
   type: SchoolType
 
