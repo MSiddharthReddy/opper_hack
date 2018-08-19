@@ -12,6 +12,7 @@ const RESOURCES = 'resources';
 const USERS = 'users';
 const SCHOOLS = 'schools';
 const SCHOOL_EVENTS = 'schoolEvents';
+const USER_EVENTS = 'userEvents';
 
 const filterUndefined = (obj) => Object.keys(obj).reduce((acc, n) => {
   if (obj[n] !== undefined) acc[n] = obj[n];
@@ -21,7 +22,7 @@ const filterUndefined = (obj) => Object.keys(obj).reduce((acc, n) => {
 const resolvers = {
   Query: {
     users: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
-        db.collection(USERS).find({}).toArray((err, docs) => {
+        db.collection(USERS).find({ name: }).toArray((err, docs) => {
           if (err) console.error(err);
           else console.log(docs);
           return res(docs);
@@ -48,7 +49,7 @@ const resolvers = {
   Mutation: {
     addResources: async(obj, args, context) => {
       const result = args.names.reduce((acc, name, index) =>
-        acc.concat({ name, link: args.links[index]}),
+        acc.concat({ name, link: args.links[index] }),
       []);
 
       return doMongo(async(db) => new Promise((res, rej) => {
@@ -103,7 +104,15 @@ const resolvers = {
         else console.log(docs);
         return res(docs);
       });
-    }))
+    })),
+
+    checklist: async(user) => doMongo(async(db) => new Promise((res, rej) => {
+      db.collection(USER_EVENTS).find({ userEmail: user.email }).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res(docs);
+      });
+    }));
   },
 
   Resource: {
@@ -114,10 +123,24 @@ const resolvers = {
         return res(docs);
       });
     }))
-  }
+  },
+
+  UserEvent: {
+    user: async(userEvent) => doMongo(async(db) => new Promise((res, rej) => {
+      db.collection(USERS).find({ email: userEvent.userEmail }).toArray((err, docs) => {
+        if (err) console.error(err);
+        else console.log(docs);
+        return res(docs);
+      });
+    })),
+  },
 };
 
 const app = express();
+
+
+const server = new ApolloServer({ typeDefs, resolvers });
+server.applyMiddleware({app});
 
 app.post('/registration-form', (req, res) => {
   console.log(req.body);
@@ -125,10 +148,7 @@ app.post('/registration-form', (req, res) => {
   res.status(200).end();
 });
 
-const server = new ApolloServer({ typeDefs, resolvers });
-server.applyMiddleware({app});
-
 const port = process.env.PORT || 4000;
-app.listen({ port, }, () => {
+app.listen({ port }, () => {
   console.log(`🚀  Server ready at ${port}`);
 });

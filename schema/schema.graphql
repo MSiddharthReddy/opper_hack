@@ -1,5 +1,5 @@
 type Query {
-  users(id: String): [User!]
+  users(email: String): [User!]
   resources(name: String): [Resource]
   schools(name: String, type: SchoolType): [School]
 }
@@ -73,7 +73,6 @@ type School {
   type: SchoolType
 
   events: [Event!]!
-  registrationDeadline: String
 
   students: [User!]!
 
@@ -100,7 +99,7 @@ type UserEvent {
   eventName: String
 
   user: User
-  username: String
+  userEmail: String
 
   state: UserEventState
 }
