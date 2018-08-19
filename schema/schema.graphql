@@ -32,6 +32,9 @@ type Mutation {
 
   "Adds event for school with school name"
   addSchoolEvent(schoolName: String!, link: String!, name: String!, description: String!, deadline: String!): Query
+
+  "Set user desired school to school with given name"
+  addUserDesiredSchool(userEmail: String!, schoolName: String!): Query
 }
 
 type User {
@@ -59,6 +62,9 @@ type User {
   school: School
 
   schoolName: String
+
+  desiredSchoolNames: [String!]!
+  desiredSchools: [School!]!
 }
 
 enum SchoolType {
