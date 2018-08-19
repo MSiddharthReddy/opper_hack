@@ -105,13 +105,10 @@ const resolvers = {
       });
     })),
 
-    addResourceTag: async(obj, args) => doMongo(async(db, err) => new Promise((res, rej) => {
-      db.collection(RESOURCE_TAGS).updateOne({ name: args.name }, { $set: args},{ upsert: true}, (err, result) => {
-        if (err) console.error(err);
-        else console.log(result);
-        return res({});
-      });
-    })),
+    addResourceTag: async(obj, args) => doMongo(async(db) => {
+      await db.collection(RESOURCE_TAGS).updateOne({ name: args.name }, { $set: args }, { upsert: true });
+      return {};
+    }),
   },
 
   School: {
@@ -140,29 +137,22 @@ const resolvers = {
       return db.collection(USER_EVENTS).find({ userEmail: user.email }).toArray()
     }),
 
-    desiredSchools: async(user) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOLS).find({ name: [] })
-    })),
+    desiredSchools: async(user) => doMongo(async(db) => {
+      const schools = db.collection(SCHOOLS).find({ }).toArray();
+
+      // TODO optimize
+      return schools.filter(it => user.desiredSchoolNames.includes(it.name));
+    }),
   },
 
   Resource: {
-    school: async(resource) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(SCHOOLS).find({ name: resource.schoolName }).toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        return res(docs);
-      });
-    }))
+    school: async(resource) => doMongo(async(db) =>
+      db.collection(SCHOOLS).findOne({ name: resource.schoolName })),
   },
 
   UserEvent: {
-    user: async(userEvent) => doMongo(async(db) => new Promise((res, rej) => {
-      db.collection(USERS).find({ email: userEvent.userEmail }).toArray((err, docs) => {
-        if (err) console.error(err);
-        else console.log(docs);
-        return res(docs);
-      });
-    })),
+    user: async(userEvent) => doMongo(async(db) =>
+      db.collection(USERS).findOne({ email: userEvent.userEmail })),
 
     event: async(userEvent) => doMongo(async(db) =>
       db.collection(SCHOOL_EVENTS).findOne({ name: userEvent.eventName })),
