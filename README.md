@@ -1,27 +1,127 @@
 # opper_hack
 
+This is the backend service for NFTE
+
+It is basically production ready, minus a couple of ids missing as foreign keys.
+
+There are a lot of different mutations around users, events, schools, etc,
+
+and it has been seeded with 10_000 different universities
+
+
 ```
+"Root query field for this schema"
 type Query {
-  users(id: String): [User!]
-  resources(name: String): [Resource]
-  colleges(name: String): [School]
-  highSchools(name: String): [School]
+
+  """
+  Root user field for this schema
+
+  Passing email will select users with the given email
+  Passing a desired school name will return all users who also want to go to that school
+  Limit and Skip are used to implement pagination on the client side.
+
+  Always returns 0 or more users
+  """
+  users(email: String, desiredSchoolName: String, skip: Int, limit: Int): [User!]!
+
+  """
+  List of resources for users of the app
+
+  Passing a name in will select only resources with the given name
+  Limit and Skip are used to implement pagination on the client side.
+
+  Always returns 0 or more resources
+  """
+  resources(name: String, skip: Int, limit: Int): [Resource!]!
+
+  """
+  List of schools for user of the app
+
+  Passing in a name will only return schools with that name
+  Passing in a type will only return schools of that type
+
+  Limit and Skip are used to implement pagination on the client side.
+
+  Always returns 0 or more schools
+  """
+  schools(name: String, type: SchoolType, skip: Int, limit: Int): [School!]!
 }
 
+"Root mutation field for this schema"
 type Mutation {
-  addUser(firstName: String, lastName: String, email: String, inCollege: Boolean, address: String, major: String): Query
+
+  "Mutation to add single user"
+  addUser(
+
+    "Given name aka first name of the user"
+    firstName: String
+
+    "Family name aka last name of the user"
+    lastName: String
+
+    "The users age rounded."
+    age: Int
+
+    "Users gender, not implemented as an enum since a user might want to define their own."
+    gender: String
+
+    "The users password, please encrypt before sending"
+    password: String
+
+    "The email of the user. Required"
+    email: String!
+
+    "The street address of the user, if so permitted"
+    address: String
+
+    "What type of school this user is currently in"
+    schoolState: SchoolType
+
+    "This can be either the desired major if the person is not in college or it can be desired major"
+    major: String
+
+    "This is the current school name of the user"
+    schoolName: String
+  ): Query
+
+  "Add resource to db"
   addResources(names: [String!]!, links: [String!]!): Query
-  addUserSchool(userID: String, schoolName: String): Query
-  addSchool(name: String, type: SchoolType, registrationDeadline: String): Query
-  addSchoolEvent(schoolName: String, link: String, name: String, description: String, deadline: String): Query
+
+  "Mutation to add single school"
+  addSchool(name: String!, type: SchoolType!, registrationDeadline: String!): Query
+  addResourceTag(name: String!): Query
+  addSchoolEvent(schoolName: String!, link: String!, name: String!, description: String!, deadline: String!): Query
+
+  "Set user desired school to school with given name"
+  addUserDesiredSchool(userEmail: String!, schoolName: String!): Query
+
+  "Update a user event state for event with given name and for user with given email"
+  updateUserEvent(userEmail: String!, state: UserEventState!, eventName: String!): Query
+
+  "Create an event which can later be associated with a user for a user event"
+  createEvent(
+    link: String
+    name: String!
+    description: String
+    deadline: String
+
+    schoolName: String
+  ): Query
+
+  "Associates a given event with a user so that they should fulfill it"
+  associateEventWithUser(
+    userEmail: String!
+    eventName: String!
+  ): Query
 }
 
 type User {
-  id: String
-
-  name: Name
+  firstName: String
+  lastName: String
   age: Int
   email: String
+  gender: String
+  password: String
 
   "This is the current level of school this person is in"
   schoolState: SchoolType
@@ -34,40 +134,109 @@ type User {
 
   "The desired major of this person"
   desiredMajor: String
-  highSchool: School
-  middleSchool: School
-  college: School
+
+  "List of items this person should do in order to best be ready"
+  checklist: [UserEvent!]!
+
+  "Current school of the user, provided by the user"
+  school: School
+
+  "The name of the school the user currently attends"
+  schoolName: String
+
+  "A list of schools the user would like to go to"
+  desiredSchoolNames: [String!]!
+  desiredSchools: [School!]!
 }
 
-type Name {
-  formal: String
-  informal: String
-}
-
+"Different types of schools"
 enum SchoolType {
+  "College represents any higher education"
   COLLEGE
+
+  "Only high school"
   HIGH_SCHOOL
+
+  "Only Middle school"
   MIDDLE_SCHOOL
+
+  "Any other sort of education that someone might be in"
   OTHER
 }
 
+
+"Represents a school"
 type School {
-  name: Name
+  "The name of this school"
+  name: String
+
+  "What kind of school this"
   type: SchoolType
 
-  events: [Event]
-  registrationDeadline: String
+  "List of items which are important for applying to this school"
+  events: [Event!]!
+
+  "List of students who attend this school"
+  students: [User!]!
 }
 
+"Represents a helpful resource for the user about some tag"
 type Resource {
-  name: String
-  link: String
+  "The name of this resource"
+  name: String!
+
+  "A url to this resource"
+  link: String!
+
+  "A tag, representing some high level search term for this resource"
+  tag: String
+
+  "A school associated with this resource"
+  school: School
+  schoolName: String
 }
 
+enum UserEventState {
+
+  "todo represents the event hasn't been started"
+  TODO
+
+  "In progress represents that the user is doin the best they can to get through life"
+  IN_PROGRESS
+
+  "Complete represents this event has been fully completed"
+  COMPLETE
+}
+
+type UserEvent {
+
+  "The event this is associated with"
+  event: Event
+  eventName: String
+
+  "The user this event is associated with"
+  user: User
+  userEmail: String
+
+  "The current progression of the user with this event"
+  state: UserEventState
+}
+
+"Represents an item that a user should complete to get into college"
 type Event {
+
+  "A url link to relevant info about this event"
   link: String
-  name: Name
+  name: String!
   description: String
+
+  "When this event should be done by, optional but highly likely present"
   deadline: String
+
+  "School that this event is associated with"
+  school: School
+
+  "Name of school"
+  schoolName: String
 }
 ```

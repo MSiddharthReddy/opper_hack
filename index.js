@@ -31,8 +31,8 @@ const resolvers = {
   Query: {
     users: async(obj, args) => doMongo(async(db) => {
       let users = await db.collection(USERS).find(filterUndefined({ email: args.email }));
-      if (args.limit || args.limit === 0) users = users.limit(args.limit);
       if (args.skip || args.skip === 0) users = users.skip(args.skip);
+      if (args.limit || args.limit === 0) users = users.limit(args.limit);
       users = await users.toArray();
       if (!args.desiredSchoolNames) return users;
       return users.filter(it => it.desiredSchoolNames && it.desiredSchoolNames.includes(args.desiredSchoolName));
@@ -40,15 +40,15 @@ const resolvers = {
 
     schools: async(obj, args) => doMongo(async(db) => {
       let schools = db.collection(SCHOOLS).find(filterUndefined({ name: args.name, type: args.schoolType }));
-      if (args.limit || args.limit === 0) schools = schools.limit(args.limit);
       if (args.skip || args.skip === 0) schools = schools.skip(args.skip);
+      if (args.limit || args.limit === 0) schools = schools.limit(args.limit);
       return schools.toArray();
     }),
 
     resources: async(query, args) => doMongo(async(db) => {
       let resources = db.collection(RESOURCES).find({});
-      if (args.limit || args.limit === 0) resources = resources.limit(args.limit);
       if (args.skip || args.skip === 0) resources = resources.skip(args.skip);
+      if (args.limit || args.limit === 0) resources = resources.limit(args.limit);
       return resources.toArray();
     }),
   },
