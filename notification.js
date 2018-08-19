@@ -2,11 +2,9 @@ const nodemailer = require('nodemailer');
 const config = require('./config.json');
 
 var transporter = nodemailer.createTransport({
-    host: 'mail.gmx.com',
-    port: 465,
-    secure: true,
+  service: 'FastMail',
   auth: {
-    user: 'person_the@gmx.com',
+    user: 'test_person@fastmail.com',
     pass: 'opportunity_hack2018'
   }
 });

@@ -56,7 +56,7 @@ const resolvers = {
       db.collection(RESOURCES).insertMany(args.names.reduce((acc, name, index) =>
       acc.concat({ name, link: args.links[index] }), []))),
 
-    addUser:async(obj, args) => 
+    addUser:async(obj, args) =>
       doMongo(async(db, err) => db.collection(USERS).insertOne(args)),
 
     addSchool: async(obj, args) => doMongo(async(db) =>
@@ -82,7 +82,7 @@ const resolvers = {
     addResourceTag: async(obj, args) => doMongo(async(db) =>
       db.collection(RESOURCE_TAGS).updateOne({ name: args.name }, { $set: args }, { upsert: true })),
 
-    updateUserEvent: async(mutation, args) => doMongo(async(db) => 
+    updateUserEvent: async(mutation, args) => doMongo(async(db) =>
       db.collection(USER_EVENTS).updateOne({ eventName: args.eventName, userEmail: args.userEmail }, {
         $set: { state: args.state },
       }, { upsert: false })),
