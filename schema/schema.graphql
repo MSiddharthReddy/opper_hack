@@ -156,44 +156,75 @@ enum SchoolType {
 
 "Represents a school"
 type School {
+  "The name of this school"
   name: String
+
+  "What kind of school this"
   type: SchoolType
+
+  "List of items which are important for applying to this school"
   events: [Event!]!
 
   "List of students who attend this school"
   students: [User!]!
 }
 
+"Represents a helpful resource for the user about some tag"
 type Resource {
+  "The name of this resource"
   name: String!
+
+  "A url to this resource"
   link: String!
+
+  "A tag, representing some high level search term for this resource"
   tag: String
-  schoolName: String
+
+  "A school associated with this resource"
   school: School
+  schoolName: String
 }
 
 enum UserEventState {
+
+  "todo represents the event hasn't been started"
   TODO
+
+  "In progress represents that the user is doin the best they can to get through life"
   IN_PROGRESS
+
+  "Complete represents this event has been fully completed"
   COMPLETE
 }
 
 type UserEvent {
+
+  "The event this is associated with"
   event: Event
   eventName: String
 
+  "The user this event is associated with"
   user: User
   userEmail: String
 
+  "The current progression of the user with this event"
   state: UserEventState
 }
 
 "Represents an item that a user should complete to get into college"
 type Event {
+
+  "A url link to relevant info about this event"
   link: String
   name: String!
   description: String
+
+  "When this event should be done by, optional but highly likely present"
   deadline: String
+
+  "School that this event is associated with"
   school: School
+
+  "Name of school"
   schoolName: String
 }
