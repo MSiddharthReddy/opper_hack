@@ -89,8 +89,7 @@ const resolvers = {
       user.desiredSchoolNames.push(args.schoolName);
       await collection.updateOne({ email: args.userEmail }, { $set: { desiredSchoolNames: user.desiredSchoolNames } }, { upsert: true});
       return {};
-      })
-    ,
+    }),
 
     addSchoolEvent: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOL_EVENTS).updateOne({ name: args.name, schoolName: args.schoolName },
