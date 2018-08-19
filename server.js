@@ -150,10 +150,11 @@ const resolvers = {
 const app = express();
 
 app.use(cors());
-app.use(bodyParser.text({ type: 'application/graphql' }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const server = new ApolloServer({ typeDefs, resolvers });
-server.applyMiddleware({app});
+server.applyMiddleware({ app });
 
 app.post('/registration-form', (req, res) => {
   console.log(req.body);
