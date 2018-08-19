@@ -126,9 +126,14 @@ const app = express();
 
 app.use(bodyParser.text({ type: 'application/graphql' }));
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({ typeDefs, resolvers, introspection: true });
 server.applyMiddleware({app});
 
+app.post('/registration-form', (req, res) => {
+  console.log(req.body);
+
+  res.status(200).end();
+});
 
 const port = process.env.PORT || 4000;
 app.listen({ port }, () => {
