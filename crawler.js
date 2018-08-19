@@ -4,7 +4,7 @@ const doMongo = require('./mongo.js');
 const RESOURCES = 'resources';
 const RESOURCE_TAGS = 'resourceTags';
 
-module.exports = () => {
+// module.exports = () => {
   doMongo(async(db, err) => {
     const resourceTags = await db.collection(RESOURCE_TAGS).find().toArray();
     resourceTags.map( resource => {
@@ -15,7 +15,7 @@ module.exports = () => {
       search(options);
     })
   });
-};
+// };
 
 const search = (options) => {
   scraper.search(options, function(err, url, meta) {
