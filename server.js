@@ -150,10 +150,11 @@ const resolvers = {
 const app = express();
 
 app.use(cors());
-app.use(bodyParser.text({ type: 'application/graphql' }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-const server = new ApolloServer({ typeDefs, resolvers });
-server.applyMiddleware({app});
+const server = new ApolloServer({ typeDefs, resolvers, introspection: true });
+server.applyMiddleware({ app });
 
 app.post('/registration-form', (req, res) => {
   console.log(req.body);
@@ -163,5 +164,5 @@ app.post('/registration-form', (req, res) => {
 
 const port = process.env.PORT || 4000;
 app.listen({ port }, () => {
-  console.log(`🚀  Server ready at ${port}`);
+  console.log(`🚀  Server ready at ${port}, graphql path: ${server.graphqlPath}`);
 });
