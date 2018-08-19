@@ -51,6 +51,8 @@ type User {
   "The desired major of this person"
   desiredMajor: String
 
+  "List of items this person should do in order to best be ready"
+  checklist: [UserEvent!]!
   "This is the school of the user"
   school: School
 
@@ -78,6 +80,24 @@ type Resource {
   name: String!
   link: String!
   tag: String
+  schoolName: String
+  school: School
+}
+
+enum UserEventState {
+  TODO
+  IN_PROGRESS
+  COMPLETE
+}
+
+type UserEvent {
+  event: Event
+  eventName: String
+
+  user: User
+  username: String
+
+  state: UserEventState
 }
 
 type Event {
