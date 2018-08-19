@@ -78,6 +78,17 @@ const resolvers = {
       });
     })),
 
+    addUserDesiredSchool: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
+      const collection = db.collection(USERS);
+      let desiredSchools = collection.find({email: args.userEmail}).toArray();
+      desiredSchools.push(args.schoolName);
+      collection.updateOne({ email: args.userEmail }, { $set: { desiredSchools } }, { upsert: true}, (err, result) => {
+        if (err) console.error(err);
+        else console.log(result);
+        return res({});
+      });
+    })),
+
     addSchoolEvent: async(obj, args, context) => doMongo(async(db) => new Promise((res, rej) => {
       db.collection(SCHOOL_EVENTS).updateOne({ name: args.name, schoolName: args.schoolName },
         { $set: args }, { upsert: true }, (err, result) => {
